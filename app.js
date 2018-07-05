@@ -612,8 +612,7 @@ bot.dialog("new",function(session){
 })
     
   
-    
-    
+//yes
 
 
     
