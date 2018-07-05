@@ -1,2 +1,3 @@
+﻿git clone https://github.com/aishop07/Bot.git
 git帳號 aishop07@outlook.com
 git密碼 aien0207
