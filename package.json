@@ -1,0 +1,18 @@
+{
+  "name": "baobaobot",
+  "version": "1.0.0",
+  "description": "creat my first bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "3.12.0",
+    "dotenv-extended": "^2.0.2",
+    "mysql": "^2.15.0",
+    "request": "^2.87.0",
+    "restify": "6.3.2"
+  }
+}
