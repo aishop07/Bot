@@ -1,9 +1,13 @@
 restify = require('restify');
 builder = require('botbuilder');
 request = require('request');
+const nodemailer = require('nodemailer');
+const xoauth2 = require('xoauth2');
 var menu = require("./menuConfig.json");
 var mainMenu = menu.main;
 server = restify.createServer();
+
+
 
 server.listen(process.env.port || process.env.PORT || "3978", function () {
     console.log('%s listening to %s', server.name, server.url);
@@ -158,7 +162,7 @@ bot.dialog('login', [
                 builder.SuggestedActions.create(
                     session, [
                         builder.CardAction.imBack(session, "登入🔑", "登入🔑"),
-                        builder.CardAction.openUrl(session, "http://127.0.0.1:8000/member/forget/", "忘記密碼"),
+                        builder.CardAction.imBack(session, "忘記密碼😱", "忘記密碼😱"),
                         builder.CardAction.imBack(session, "首頁⛱️", "首頁⛱️"),
                     ]
                 ))
@@ -186,30 +190,55 @@ bot.dialog('login', [
 
     }]).triggerAction({ matches: /^登入🔑$/ })
 
-// bot.dialog('forget', [
-//     function (session) {
-//         builder.Prompts.text(session, '請輸入email')
-//     },
-//     validmessage = '',
-//     function (session, results) {
-//         session.dialogData.email = results.response
-//         for (var i = 0; i < alldata.length; i++) {
-//             if (session.conversationData.login.useremail == alldata[i].useremail) {
-//                 validmessage = '驗證成功!'
-//                 i = alldata.length
-//             }
-//         }
-//         if (validmessage == '驗證成功') {
+bot.dialog('forget', [
+    function (session) {
+        builder.Prompts.text(session, '請輸入email')
+    },
+   
+    function (session, results) { 
+        validmessage = ''
+        session.dialogData.email = results.response
+        for (var i = 0; i < alldata.length; i++) {
+            if (session.dialogData.email == alldata[i].useremail) {
+                validmessage = '驗證成功!'
+                i = alldata.length-1
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                      type: 'OAuth2',
+                      user: 'testbotmail0706@gmail.com',
+                            clientId: '741548107842-dtug0l7uin5l56egm2anqk8gm13jbghj.apps.googleusercontent.com',
+                            clientSecret: 'g20YsRQ5AVaoRiyXDeOk3bfl',
+                            refreshToken: '1/JcSzPiVNiMevUIs8YmCSSkjCyLVmP69lbNXI_r_voWU',
+                            accessToken:'ya29.GlvwBUxWVvVjuY8X36cSqQ3LKTZvPqPkLJ7KTffpQU-78pBILzF6zdWuZ8UXBeiSvUoSOBl0SMJkGPMSTVsGUsGkAkwtHtbpkaq0WhzCgzs0UacPrfsYH2Wn9Pf7'
+                    },
+                  });
+                var mailOptions = {
+                    from: 'testbotmail0706@gmail.com',
+                    to: session.dialogData.email,
+                    subject: '無人商店密碼',
+                    text: 'Your password : ' + alldata[i].password
+                }
+                
+                transporter.sendMail(mailOptions, function (err, res) {
+                    if(err){
+                        console.log('Error');
+                    } else {
+                        console.log('Email Sent');
+                    }
+                })
+                
+        }}
+        if (validmessage == '驗證成功!') {
+            session.send('電子郵件傳送成功')
+            session.replaceDialog('mainmenu')
+        }
+        else {
+            session.send('無此電子郵件，請重新輸入')
+        }
+    }
+]).triggerAction({ matches: /^忘記密碼😱$/ })
 
-//         }
-//         else {
-//             session.send('無此電子郵件，請重新輸入')
-//         }
-
-
-//     },
-
-// ]).triggerAction({ matches: /^忘記密碼$/ })
 bot.dialog('Contact',[
     function(session){
     var msg =new builder.Message(session);
