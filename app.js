@@ -313,7 +313,7 @@ bot.dialog('mainMenu', [
         member=session.conversationData.login
         if (member){
         var promptText;
-        if (args && args.reprompt) {
+        if (session.conversationData.orders) {
             promptText = "請問你要再買些什麼?"
         } else {
             var promptText = "請問你要買什麼?"
@@ -324,7 +324,8 @@ bot.dialog('mainMenu', [
         msg.suggestedActions(builder.SuggestedActions.create(
             session, [
                 builder.CardAction.imBack(session, "購物車", "購物車🛒"),
-                builder.CardAction.imBack(session, "結帳", "結帳💲")
+                builder.CardAction.imBack(session, "結帳", "結帳💲"),
+                builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
             ]
         ))
         session.send(msg)}
@@ -387,7 +388,8 @@ bot.dialog('drinkMenu', function (session) {
         session, [
             builder.CardAction.imBack(session, "零食", "零食🍔"),
             builder.CardAction.imBack(session, "購物車", "購物車🛒"),
-            builder.CardAction.imBack(session, "結帳", "結帳💲")
+            builder.CardAction.imBack(session, "結帳", "結帳💲"),
+            builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️"),
         ]
     ));
 
@@ -437,7 +439,8 @@ bot.dialog('foodMenu', function (session) {
     msg.suggestedActions(builder.SuggestedActions.create(session, [
         builder.CardAction.imBack(session, "飲料", "飲料🥤"),
         builder.CardAction.imBack(session, "購物車", "購物車🛒"),
-        builder.CardAction.imBack(session, "結帳", "結帳💲")
+        builder.CardAction.imBack(session, "結帳", "結帳💲"),
+        builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
     ]));
 })
     .triggerAction({ matches: /^零食$/ });
@@ -516,7 +519,8 @@ bot.dialog("cart", [
 
             msg.suggestedActions(builder.SuggestedActions.create(session, [
                 builder.CardAction.imBack(session, "繼續購物", "繼續購物"),
-                builder.CardAction.imBack(session, "結帳", "結帳💲")
+                builder.CardAction.imBack(session, "結帳", "結帳💲"),
+                builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
             ]));
 
             session.send(msg)
@@ -618,7 +622,8 @@ bot.dialog('checkOut', [
 
         var contiune = new builder.Message(session)
         contiune.suggestedActions(builder.SuggestedActions.create(session, [
-            builder.CardAction.postBack(session, "new", "繼續購物")
+            builder.CardAction.postBack(session, "new", "繼續購物"),
+            builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
         ]));
 
         session.send("感謝您的訂購，您的商品將於三天內寄出，謝謝~")
