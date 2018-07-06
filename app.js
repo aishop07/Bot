@@ -660,6 +660,7 @@ bot.dialog("new", function (session) {
 
 
 
+//1.0
 
 
 
