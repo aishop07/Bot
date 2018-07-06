@@ -615,10 +615,16 @@ bot.dialog('checkOut', [
             .total(`$${total}`);
         msg.addAttachment(attachment)
         session.endConversation(msg);
+       
+      session.conversationData.login = ({ item: 'login' })
+       session.conversationData.login.acoount='account'
+       session.conversationData.login.password='password'
+        
 
         var contiune = new builder.Message(session)
         contiune.suggestedActions(builder.SuggestedActions.create(session, [
-            builder.CardAction.postBack(session, "new", "繼續購物")
+            builder.CardAction.postBack(session, "new", "繼續購物"),
+            builder.CardAction.postBack(session, "首頁⛱️", "首頁⛱️")
         ]));
 
         session.send("感謝您的訂購，您的商品將於三天內寄出，謝謝~")
@@ -637,7 +643,8 @@ bot.dialog("new", function (session) {
 })
 
 
-//yess
+
+
 
 
 
