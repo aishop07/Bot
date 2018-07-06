@@ -210,7 +210,22 @@ bot.dialog('login', [
 //     },
 
 // ]).triggerAction({ matches: /^忘記密碼$/ })
-
+bot.dialog('Contact',[
+    function(session){
+    var msg =new builder.Message(session);
+    var heroCard = new builder.HeroCard(session)
+    .title("第五組")
+    .subtitle("無人商店")
+    .text("106台北市大安區復興南路一段390號 2,3,15樓")
+    .images([builder.CardImage.create(session,"http://joomly.net/frontend/web/images/googlemap/map.png")])
+    .buttons([
+        builder.CardAction.imBack(session,"AIEN0205@gmail.com","電子郵件📧"),
+        builder.CardAction.imBack(session,"02-631-6666","聯絡電話📱"),
+        builder.CardAction.openUrl(session,"https://www.google.com/","部落格📜")
+    ]);
+    msg.addAttachment(heroCard);
+    session.endDialog(msg);}
+]).triggerAction({ matches: /^聯絡我們☎️$/ })
 
 
 bot.dialog('logout', [
