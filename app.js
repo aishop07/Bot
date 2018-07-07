@@ -235,6 +235,7 @@ bot.dialog('forget', [
         }
         else {
             session.send('無此電子郵件，請重新輸入')
+            session.replaceDialog('mainmenu')
         }
     }
 ]).triggerAction({ matches: /^忘記密碼😱$/ })
