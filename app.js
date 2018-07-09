@@ -717,7 +717,7 @@ bot.dialog("new", function (session) {
 
 
 
-//2.0
+//2.01
 
 
 
