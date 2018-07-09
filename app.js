@@ -28,7 +28,7 @@ bot = new builder.UniversalBot(connector, [
     function (session) {
         var options = {
             method: "GET",
-            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
+            url: "http://41497872.ngrok.io/api/members/",
             headers: { 'content-type': 'application/json' }
         }
         request(options, function (error, response, body) {
@@ -104,7 +104,7 @@ bot.dialog('register', [
         console.log(order)
         var options = {
             method: "POST",
-            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
+            url: "http://41497872.ngrok.io/api/members/",
             form: {
                 username: order.account,
                 password: order.password,
@@ -251,7 +251,7 @@ bot.dialog('Contact',[
     .buttons([
         builder.CardAction.imBack(session,"AIEN0205@gmail.com","電子郵件📧"),
         builder.CardAction.imBack(session,"02-631-6666","聯絡電話📱"),
-        builder.CardAction.openUrl(session,"http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/","官網📜"),
+        builder.CardAction.openUrl(session,"http://41497872.ngrok.io/","官網📜"),
         builder.CardAction.openUrl(session,"首頁⛱️","首頁⛱️"),
     ]);
     msg.addAttachment(heroCard);
@@ -339,7 +339,7 @@ bot.dialog('mainmenu', [
                 
                 options = {
                     method: 'PATCH',
-                    url: `http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/${changeindex}/`,
+                    url: `http://41497872.ngrok.io/api/members/${changeindex}/`,
                     formData: {
                         password: session.dialogData.newpassword
                     },
@@ -395,7 +395,7 @@ bot.dialog('drinkMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/drinks/?format=json';
+    var url = 'http://41497872.ngrok.io/api/drinks/?format=json';
     request.get({
         url: url,
         json: true,
@@ -447,7 +447,7 @@ bot.dialog('foodMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/foods/?format=json';
+    var url = 'http://41497872.ngrok.io/api/foods/?format=json';
     request.get({
         url: url,
         json: true,
@@ -646,7 +646,7 @@ bot.dialog('checkOut', [
             }
             request.post({
                 headers: { 'content-type': 'application/json' },
-                url: 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/orders/',
+                url: 'http://41497872.ngrok.io/api/orders/',
                 body: JSON.stringify(data)
 
             }, function (error, response, body) {
