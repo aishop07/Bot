@@ -251,7 +251,8 @@ bot.dialog('Contact',[
     .buttons([
         builder.CardAction.imBack(session,"AIEN0205@gmail.com","電子郵件📧"),
         builder.CardAction.imBack(session,"02-631-6666","聯絡電話📱"),
-        builder.CardAction.openUrl(session,"https://www.google.com/","部落格📜")
+        builder.CardAction.openUrl(session,"http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/","官網📜"),
+        builder.CardAction.openUrl(session,"首頁⛱️","首頁⛱️"),
     ]);
     msg.addAttachment(heroCard);
     session.endDialog(msg);}
