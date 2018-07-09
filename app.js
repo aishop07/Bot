@@ -28,7 +28,7 @@ bot = new builder.UniversalBot(connector, [
     function (session) {
         var options = {
             method: "GET",
-            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
+            url: "http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/members/",
             headers: { 'content-type': 'application/json' }
         }
         request(options, function (error, response, body) {
@@ -73,8 +73,20 @@ bot.dialog('register', [
         builder.Prompts.text(session, '請輸入電子郵件')
 
     },
-    function (session, results) {
+    function (session, results,next) {
         session.dialogData.register.email = results.response
+        var check=new RegExp('^.+@.+\.{2,3}$')
+          if(!check.test(session.dialogData.register.email))
+        {
+            console.log('11')
+            session.send('電子郵件格式錯誤，請重新輸入')
+            session.replaceDialog('mainmenu')
+        }
+        else{
+            next()
+        }
+    },
+    function (session, results) {
         var validmessage = ''
         for (var i = 0; i < alldata.length; i++) {
             if (session.dialogData.register.email == alldata[i].useremail) {
@@ -94,7 +106,6 @@ bot.dialog('register', [
 
     function (session, results) {
         session.dialogData.register.birth = results.response.entity
-        console.log(session.dialogData.register.birth)
         var order = {
             account: session.dialogData.register.account,
             password: session.dialogData.register.password,
@@ -104,7 +115,7 @@ bot.dialog('register', [
         console.log(order)
         var options = {
             method: "POST",
-            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
+            url: "http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/members/",
             form: {
                 username: order.account,
                 password: order.password,
@@ -166,27 +177,35 @@ bot.dialog('login', [
                         builder.CardAction.imBack(session, "首頁⛱️", "首頁⛱️"),
                     ]
                 ))
-        var validmessage = ''
-        for (var i = 0; i < alldata.length; i++) {
-            if (session.conversationData.login.account == alldata[i].username)
-                if (session.conversationData.login.password == alldata[i].password) {
-                    validmessage = '登入成功!'
-                    i = alldata.length
-                }
+        var options = {
+            method: "GET",
+            url: "http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/members/",
+            headers: { 'content-type': 'application/json' }
         }
-        if (validmessage == '') {
-            session.endConversation()
-            session.send('帳號或密碼錯誤，請重新輸入')
-            session.send(msg2)
-        }
-        else {
-            session.send('登入成功!')
-            session.replaceDialog('mainmenu')
-            session.send(msg1)
-            session.endDialogWithResult({ response: session.conversationData.login })
-        }
+        request(options, function (error, response, body) {
+            memberdata = JSON.parse(body)
+            console.log(memberdata)
+            var validmessage = ''
+            for (var i = 0; i < memberdata.length; i++) {
+                if (session.conversationData.login.account == memberdata[i].username)
+                    if (session.conversationData.login.password == memberdata[i].password) {
+                        validmessage = '登入成功!'
+                        i = memberdata.length
+                    }
+            }
+            if (validmessage == '') {
+                session.endConversation()
+                session.send('帳號或密碼錯誤，請重新輸入')
+                session.send(msg2)
+            }
+            else {
+                session.send('登入成功!')
+                session.replaceDialog('mainmenu')
+                // session.send(msg1)
+                session.endDialogWithResult({ response: session.conversationData.login })
+            }
 
-
+        })
 
     }]).triggerAction({ matches: /^登入🔑$/ })
 
@@ -194,41 +213,42 @@ bot.dialog('forget', [
     function (session) {
         builder.Prompts.text(session, '請輸入email')
     },
-   
-    function (session, results) { 
+
+    function (session, results) {
         validmessage = ''
         session.dialogData.email = results.response
         for (var i = 0; i < alldata.length; i++) {
             if (session.dialogData.email == alldata[i].useremail) {
                 validmessage = '驗證成功!'
-                i = alldata.length-1
+                i = alldata.length - 1
                 const transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                      type: 'OAuth2',
-                      user: 'testbotmail0706@gmail.com',
-                            clientId: '741548107842-dtug0l7uin5l56egm2anqk8gm13jbghj.apps.googleusercontent.com',
-                            clientSecret: 'g20YsRQ5AVaoRiyXDeOk3bfl',
-                            refreshToken: '1/JcSzPiVNiMevUIs8YmCSSkjCyLVmP69lbNXI_r_voWU',
-                            accessToken:'ya29.GlvwBUxWVvVjuY8X36cSqQ3LKTZvPqPkLJ7KTffpQU-78pBILzF6zdWuZ8UXBeiSvUoSOBl0SMJkGPMSTVsGUsGkAkwtHtbpkaq0WhzCgzs0UacPrfsYH2Wn9Pf7'
+                        type: 'OAuth2',
+                        user: 'testbotmail0706@gmail.com',
+                        clientId: '741548107842-dtug0l7uin5l56egm2anqk8gm13jbghj.apps.googleusercontent.com',
+                        clientSecret: 'g20YsRQ5AVaoRiyXDeOk3bfl',
+                        refreshToken: '1/JcSzPiVNiMevUIs8YmCSSkjCyLVmP69lbNXI_r_voWU',
+                        accessToken: 'ya29.GlvwBUxWVvVjuY8X36cSqQ3LKTZvPqPkLJ7KTffpQU-78pBILzF6zdWuZ8UXBeiSvUoSOBl0SMJkGPMSTVsGUsGkAkwtHtbpkaq0WhzCgzs0UacPrfsYH2Wn9Pf7'
                     },
-                  });
+                });
                 var mailOptions = {
                     from: 'testbotmail0706@gmail.com',
                     to: session.dialogData.email,
                     subject: '無人商店密碼',
                     text: 'Your password : ' + alldata[i].password
                 }
-                
+
                 transporter.sendMail(mailOptions, function (err, res) {
-                    if(err){
+                    if (err) {
                         console.log('Error');
                     } else {
                         console.log('Email Sent');
                     }
                 })
-                
-        }}
+
+            }
+        }
         if (validmessage == '驗證成功!') {
             session.send('電子郵件傳送成功')
             session.replaceDialog('mainmenu')
@@ -240,22 +260,23 @@ bot.dialog('forget', [
     }
 ]).triggerAction({ matches: /^忘記密碼😱$/ })
 
-bot.dialog('Contact',[
-    function(session){
-    var msg =new builder.Message(session);
-    var heroCard = new builder.HeroCard(session)
-    .title("第五組")
-    .subtitle("無人商店")
-    .text("106台北市大安區復興南路一段390號 2,3,15樓")
-    .images([builder.CardImage.create(session,"http://joomly.net/frontend/web/images/googlemap/map.png")])
-    .buttons([
-        builder.CardAction.imBack(session,"AIEN0205@gmail.com","電子郵件📧"),
-        builder.CardAction.imBack(session,"02-631-6666","聯絡電話📱"),
-        builder.CardAction.openUrl(session,"http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/","官網📜"),
-        builder.CardAction.openUrl(session,"首頁⛱️","首頁⛱️"),
-    ]);
-    msg.addAttachment(heroCard);
-    session.endDialog(msg);}
+bot.dialog('Contact', [
+    function (session) {
+        var msg = new builder.Message(session);
+        var heroCard = new builder.HeroCard(session)
+            .title("第五組")
+            .subtitle("無人商店")
+            .text("106台北市大安區復興南路一段390號 2,3,15樓")
+            .images([builder.CardImage.create(session, "http://joomly.net/frontend/web/images/googlemap/map.png")])
+            .buttons([
+                builder.CardAction.imBack(session, "AIEN0205@gmail.com", "電子郵件📧"),
+                builder.CardAction.imBack(session, "02-631-6666", "聯絡電話📱"),
+                builder.CardAction.openUrl(session, "http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/", "官網📜"),
+                builder.CardAction.openUrl(session, "首頁⛱️", "首頁⛱️"),
+            ]);
+        msg.addAttachment(heroCard);
+        session.endDialog(msg);
+    }
 ]).triggerAction({ matches: /^聯絡我們☎️$/ })
 
 
@@ -282,7 +303,7 @@ bot.dialog('mainmenu', [
         var member = session.conversationData.login
         if (member) {
             video.media([
-                { url: 'https://r6---sn-ipoxu-un5d.googlevideo.com/videoplayback?fexp=23709359&sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pcm2cms,pl,ratebypass,requiressl,source&fvip=5&mime=video%2Fwebm&c=WEB&signature=1EED65FE5359E8B70AFBAACA699CEE86FCF71536.6EF42FD9535DAD5092ECAC99BC80D434BA9EFB42&source=youtube&pl=21&ratebypass=yes&gir=yes&expire=1530780388&clen=2022487&ei=g4Y9W9rWOcyJoAPIm7P4Dg&ipbits=0&requiressl=yes&itag=43&id=o-AJxh4GW1uhPaysji41cbZbQTNvDvppmFUyEDBbeqXdAM&lmt=1370870553211424&dur=0.000&key=cms1&ip=2400%3A8901%3A%3Af03c%3A91ff%3Afe98%3A5889&title=7-ELEVEN%E3%80%8ACITY%20CAFE%E3%80%8B%E9%9B%86%E9%BB%9E%E9%80%81_%E5%B0%8F%E7%8E%8B%E5%AD%90%E7%AB%A5%E8%A9%B1%E7%A2%97%E7%9B%A4%E7%B5%84&redirect_counter=1&rm=sn-a5mk77d&req_id=6f3a78fc6deea3ee&cms_redirect=yes&ipbypass=yes&mip=118.160.77.63&mm=31&mn=sn-ipoxu-un5d&ms=au&mt=1530758680&mv=m&pcm2cms=yes' }
+                { url: 'https://r6---sn-un57en7l.googlevideo.com/videoplayback?dur=0.000&ei=XElDW5HsNr2tz7sPufq18AI&expire=1531157949&pl=24&mime=video%2Fwebm&id=o-AD7nysOy3SNu1RcT5ifdGz7LtnVuxuZg61v71_zZSXg7&ipbits=0&requiressl=yes&ip=2400%3A8901%3A%3Af03c%3A91ff%3Afe98%3A5889&gir=yes&ratebypass=yes&signature=820D3657E0C09450347A93D686C54AAC63C684CA.236B6AE85121AF59F7E720DC5767FCDEFB7618E0&c=WEB&itag=43&lmt=1370870553211424&key=cms1&fvip=6&fexp=23709359&sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,itag,lmt,mime,mip,mm,mn,ms,mv,pl,ratebypass,requiressl,source&clen=2022487&source=youtube&title=7-ELEVEN%E3%80%8ACITY%20CAFE%E3%80%8B%E9%9B%86%E9%BB%9E%E9%80%81_%E5%B0%8F%E7%8E%8B%E5%AD%90%E7%AB%A5%E8%A9%B1%E7%A2%97%E7%9B%A4%E7%B5%84&redirect_counter=1&cm2rm=sn-a5mkk7d&req_id=185e5d81ca5ba3ee&cms_redirect=yes&mip=125.227.255.81&mm=34&mn=sn-un57en7l&ms=ltu&mt=1531135885&mv=u' }
             ])
             video.buttons([
                 builder.CardAction.imBack(session, "登出🔓", "登出🔓"),
@@ -293,7 +314,7 @@ bot.dialog('mainmenu', [
         }
         else {
             video.media([
-                { url: 'https://r5---sn-ipoxu-un56.googlevideo.com/videoplayback?dur=0.000&gir=yes&lmt=1517288591981973&clen=7989140&source=youtube&beids=%5B9466594%5D&mime=video%2Fwebm&itag=43&expire=1530780345&sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pcm2cms,pl,ratebypass,requiressl,source&fexp=9466588,23709359&c=WEB&fvip=5&ratebypass=yes&requiressl=yes&pl=24&key=cms1&ip=2400%3A8901%3A%3Af03c%3A91ff%3Afe98%3A5889&ipbits=0&ei=WYY9W9OZKcXKowP7ir2gCg&id=o-AHOglT7M09zupZ4Ao4zdplE1UjOOWmaElY2JX0godPnT&signature=796A27690D24CE9217A1FD3844A8068E2AD16D6E.5F52232EE00002895B78596C8382B885CD9BE7D8&title=7-ELEVEN%E7%84%A1%E4%BA%BA%E5%95%86%E5%BA%97&redirect_counter=1&rm=sn-a5mkr7d&req_id=58b26db28ab4a3ee&cms_redirect=yes&ipbypass=yes&mip=125.227.255.81&mm=31&mn=sn-ipoxu-un56&ms=au&mt=1530758680&mv=m&pcm2cms=yes' }
+                { url: 'https://r5---sn-ipoxu-un56.googlevideo.com/videoplayback?sparams=clen,dur,ei,expire,gir,id,initcwndbps,ip,ipbits,ipbypass,itag,lmt,mime,mip,mm,mn,ms,mv,pcm2cms,pl,ratebypass,requiressl,source&clen=7989140&ip=2400%3A8901%3A%3Af03c%3A91ff%3Afe98%3A5889&id=o-AHlfl-DLig9EGtV-nKwz8ltRYnQs4aomng8H4eXhhDU-&c=WEB&fvip=5&ratebypass=yes&beids=%5B9466593%5D&gir=yes&ipbits=0&dur=0.000&key=cms1&lmt=1517288591981973&fexp=9466587,23709359&source=youtube&mime=video%2Fwebm&requiressl=yes&expire=1531157904&itag=43&ei=MElDW7TzAdCfz7sPhtOJyAY&pl=20&signature=751720219E91E668A72A3D2FBB959C8F5BBAB268.800F548DCECB652D2CF20F1E6A627A8FE80ACF4B&title=7-ELEVEN%E7%84%A1%E4%BA%BA%E5%95%86%E5%BA%97&redirect_counter=1&rm=sn-a5mk676&req_id=b009091085c5a3ee&cms_redirect=yes&ipbypass=yes&mip=114.24.20.22&mm=31&mn=sn-ipoxu-un56&ms=au&mt=1531136192&mv=m&pcm2cms=yes' }
             ])
             video.buttons([
                 builder.CardAction.imBack(session, "登入🔑", "登入🔑"),
@@ -306,76 +327,77 @@ bot.dialog('mainmenu', [
         session.send(msg)
     }]).triggerAction({ matches: /^首頁⛱️$/ })
 
-    bot.dialog('change', [
-        function (session) {
-            builder.Prompts.text(session, '請輸入舊密碼')
-        },
-        function (session, results, next) {
-            var validmessage = ''
-            session.dialogData.password = results.response
-            for (var i = 0; i < alldata.length; i++) {
-                if (session.dialogData.password == alldata[i].password) {
-                    var validmessage= '驗證成功'
-                    session.dialogData.validmessage=validmessage
-                    changeindex = i + 1
-                    i = alldata.length
-                    next()
-                }
-             
-                else{
+bot.dialog('change', [
+    function (session) {
+        builder.Prompts.text(session, '請輸入舊密碼')
+    },
+    function (session, results, next) {
+        var validmessage = ''
+        session.dialogData.password = results.response
+        for (var i = 0; i < alldata.length; i++) {
+            if (session.dialogData.password == alldata[i].password) {
+                var validmessage = '驗證成功'
+                session.dialogData.validmessage = validmessage
+                changeindex = i + 1
+                i = alldata.length
+                next()
+            }
+
+            else {
                 session.send('密碼錯誤，請重新輸入')
                 session.beginDialog('mainmenu')
                 i = alldata.length
             }
-            }
-         
-        },
-        function (session, results) {
-            builder.Prompts.text(session, '請輸入新密碼')
-        },
-        function (session, results) {
-            session.dialogData.newpassword = results.response        
-            if (session.dialogData.validmessage) {
-                
-                options = {
-                    method: 'PATCH',
-                    url: `http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/${changeindex}/`,
-                    formData: {
-                        password: session.dialogData.newpassword
-                    },
-            
-                }
-                request(options, function (error, response, body) {
-                    alldata = JSON.parse(body)
-                    console.log(alldata)
-                })
-            }
-    
         }
-    ]).triggerAction({ matches: /^修改密碼$/ })   
+
+    },
+    function (session, results) {
+        builder.Prompts.text(session, '請輸入新密碼')
+    },
+    function (session, results) {
+        session.dialogData.newpassword = results.response
+        if (session.dialogData.validmessage) {
+
+            options = {
+                method: 'PATCH',
+                url: `http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/members/${changeindex}/`,
+                formData: {
+                    password: session.dialogData.newpassword
+                },
+
+            }
+            request(options, function (error, response, body) {
+                alldata = JSON.parse(body)
+                console.log(alldata)
+            })
+        }
+
+    }
+]).triggerAction({ matches: /^修改密碼$/ })
 
 bot.dialog('mainMenu', [
     function (session, args) {
-        member=session.conversationData.login
-        if (member){
-        var promptText;
-        if (session.conversationData.orders) {
-            promptText = "請問你要再買些什麼?"
-        } else {
-            var promptText = "請問你要買什麼?"
-            session.conversationData.orders = new Array();
+        member = session.conversationData.login
+        if (member) {
+            var promptText;
+            if (session.conversationData.orders) {
+                promptText = "請問你要再買些什麼?"
+            } else {
+                var promptText = "請問你要買什麼?"
+                session.conversationData.orders = new Array();
+            }
+            builder.Prompts.choice(session, promptText, mainMenu, { listStyle: builder.ListStyle.button });
+            var msg = new builder.Message(session)
+            msg.suggestedActions(builder.SuggestedActions.create(
+                session, [
+                    builder.CardAction.imBack(session, "購物車", "購物車🛒"),
+                    builder.CardAction.imBack(session, "結帳", "結帳💲"),
+                    builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
+                ]
+            ))
+            session.send(msg)
         }
-        builder.Prompts.choice(session, promptText, mainMenu, { listStyle: builder.ListStyle.button });
-        var msg = new builder.Message(session)
-        msg.suggestedActions(builder.SuggestedActions.create(
-            session, [
-                builder.CardAction.imBack(session, "購物車", "購物車🛒"),
-                builder.CardAction.imBack(session, "結帳", "結帳💲"),
-                builder.CardAction.imBack(session, "首頁⛱️", "回首頁⛱️")
-            ]
-        ))
-        session.send(msg)}
-        else{
+        else {
             session.send('請先登入喔!')
             session.replaceDialog('mainmenu')
         }
@@ -395,7 +417,7 @@ bot.dialog('drinkMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/drinks/?format=json';
+    var url = 'http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/drinks/?format=json';
     request.get({
         url: url,
         json: true,
@@ -447,7 +469,7 @@ bot.dialog('foodMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/foods/?format=json';
+    var url = 'http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/foods/?format=json';
     request.get({
         url: url,
         json: true,
@@ -646,7 +668,7 @@ bot.dialog('checkOut', [
             }
             request.post({
                 headers: { 'content-type': 'application/json' },
-                url: 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/orders/',
+                url: 'http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/',
                 body: JSON.stringify(data)
 
             }, function (error, response, body) {
@@ -665,11 +687,11 @@ bot.dialog('checkOut', [
             .total(`$${total}`);
         msg.addAttachment(attachment)
         session.endConversation(msg);
-       
+
         session.conversationData.login = ({ item: 'login' })
-        session.conversationData.login.acoount='account'
-        session.conversationData.login.password='password'
-        
+        session.conversationData.login.acoount = 'account'
+        session.conversationData.login.password = 'password'
+
 
         var contiune = new builder.Message(session)
         contiune.suggestedActions(builder.SuggestedActions.create(session, [
