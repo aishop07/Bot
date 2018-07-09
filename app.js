@@ -2,7 +2,7 @@ restify = require('restify');
 builder = require('botbuilder');
 request = require('request');
 const nodemailer = require('nodemailer');
-const xoauth2 = require('xoauth2');
+// const xoauth2 = require('xoauth2');
 var menu = require("./menuConfig.json");
 var mainMenu = menu.main;
 server = restify.createServer();
@@ -28,7 +28,7 @@ bot = new builder.UniversalBot(connector, [
     function (session) {
         var options = {
             method: "GET",
-            url: "http://127.0.0.1:8000/api/members/",
+            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
             headers: { 'content-type': 'application/json' }
         }
         request(options, function (error, response, body) {
@@ -104,7 +104,7 @@ bot.dialog('register', [
         console.log(order)
         var options = {
             method: "POST",
-            url: "http://127.0.0.1:8000/api/members/",
+            url: "http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/",
             form: {
                 username: order.account,
                 password: order.password,
@@ -182,7 +182,7 @@ bot.dialog('login', [
         else {
             session.send('登入成功!')
             session.replaceDialog('mainmenu')
-            // session.send(msg1)
+            session.send(msg1)
             session.endDialogWithResult({ response: session.conversationData.login })
         }
 
@@ -338,7 +338,7 @@ bot.dialog('mainmenu', [
                 
                 options = {
                     method: 'PATCH',
-                    url: `http://127.0.0.1:8000/api/members/${changeindex}/`,
+                    url: `http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/members/${changeindex}/`,
                     formData: {
                         password: session.dialogData.newpassword
                     },
@@ -394,7 +394,7 @@ bot.dialog('drinkMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://localhost:8000/api/drinks/?format=json';
+    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/drinks/?format=json';
     request.get({
         url: url,
         json: true,
@@ -446,7 +446,7 @@ bot.dialog('foodMenu', function (session) {
     msg.attachmentLayout(builder.AttachmentLayout.carousel);
     var attachments = new Array();
 
-    var url = 'http://localhost:8000/api/foods/?format=json';
+    var url = 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/foods/?format=json';
     request.get({
         url: url,
         json: true,
@@ -645,7 +645,7 @@ bot.dialog('checkOut', [
             }
             request.post({
                 headers: { 'content-type': 'application/json' },
-                url: 'http://localhost:8000/api/orders/',
+                url: 'http://ec2-54-251-140-35.ap-southeast-1.compute.amazonaws.com/api/orders/',
                 body: JSON.stringify(data)
 
             }, function (error, response, body) {
