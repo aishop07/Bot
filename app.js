@@ -664,11 +664,12 @@ bot.dialog('checkOut', [
                 "product_name": order.name,
                 "price": order.price,
                 "qt": order.number,
-                "image": order.image
+                "image": order.image,
+                "datetime":"2018-07-10"
             }
             request.post({
                 headers: { 'content-type': 'application/json' },
-                url: 'http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/',
+                url: 'http://ec2-13-250-101-134.ap-southeast-1.compute.amazonaws.com/api/orders/',
                 body: JSON.stringify(data)
 
             }, function (error, response, body) {
