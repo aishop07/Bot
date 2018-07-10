@@ -99,17 +99,20 @@ bot.dialog('register', [
             session.replaceDialog('mainmenu')
         }
         else {
-            builder.Prompts.time(session, '請輸入生日(格式為XXXX-XX-XX)')
+            builder.Prompts.text(session, '請輸入姓名')
         }
     },
-
-
+    function(session,results){
+        seesion.dilogData.register.name=results.response
+        builder.Prompts.time(session, '請輸入生日(格式為XXXX-XX-XX)')
+    },
     function (session, results) {
         session.dialogData.register.birth = results.response.entity
         var order = {
             account: session.dialogData.register.account,
             password: session.dialogData.register.password,
             email: session.dialogData.register.email,
+            name: seesion.dilogData.register.name,
             birth: session.dialogData.register.birth,
         }
         console.log(order)
@@ -120,6 +123,7 @@ bot.dialog('register', [
                 username: order.account,
                 password: order.password,
                 useremail: order.email,
+                name:order.name,
                 userbirth: order.birth,
             },
             headers: { 'content-type': 'application/json' }
